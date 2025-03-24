@@ -15,20 +15,90 @@ CREATE SCHEMA IF NOT EXISTS `PaymentAssistant` DEFAULT CHARACTER SET utf8 COLLAT
 USE `PaymentAssistant` ;
 
 -- -----------------------------------------------------
+-- Table `PaymentAssistant`.`countries`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`countries` (
+  `country_id` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`country_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`region`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`region` (
+  `region_id` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `country_id` INT NOT NULL,
+  PRIMARY KEY (`region_id`),
+  INDEX `fk_region_countries1_idx` (`country_id` ASC) VISIBLE,
+  CONSTRAINT `fk_region_countries1`
+    FOREIGN KEY (`country_id`)
+    REFERENCES `PaymentAssistant`.`countries` (`country_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`city`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`city` (
+  `city_id` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  `region_id` INT NOT NULL,
+  PRIMARY KEY (`city_id`),
+  INDEX `fk_city_region1_idx` (`region_id` ASC) VISIBLE,
+  CONSTRAINT `fk_city_region1`
+    FOREIGN KEY (`region_id`)
+    REFERENCES `PaymentAssistant`.`region` (`region_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`address`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`address` (
+  `address_id` INT NOT NULL,
+  `linea1` VARCHAR(100) NOT NULL,
+  `linea2` VARCHAR(100) NOT NULL,
+  `postalCode` TINYINT NOT NULL,
+  `city_id` INT NOT NULL,
+  PRIMARY KEY (`address_id`),
+  INDEX `fk_address_city1_idx` (`city_id` ASC) VISIBLE,
+  CONSTRAINT `fk_address_city1`
+    FOREIGN KEY (`city_id`)
+    REFERENCES `PaymentAssistant`.`city` (`city_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `PaymentAssistant`.`pay_user`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_user` (
   `user_id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(50) NOT NULL,
   `last_name` VARCHAR(50) NOT NULL,
-  `phone` VARCHAR(20) NOT NULL,
   `birth` DATE NOT NULL,
-  `password` VARCHAR(30) NOT NULL,
+  `password` VARBINARY(250) NOT NULL,
   `delete` BIT(1) NOT NULL,
   `last_update` DATETIME NOT NULL,
   `active` BIT(1) NOT NULL,
+  `email` VARCHAR(45) NOT NULL,
+  `address_id` INT NOT NULL,
   PRIMARY KEY (`user_id`),
-  UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE)
+  UNIQUE INDEX `user_id_UNIQUE` (`user_id` ASC) VISIBLE,
+  INDEX `fk_pay_user_address1_idx` (`address_id` ASC) VISIBLE,
+  CONSTRAINT `fk_pay_user_address1`
+    FOREIGN KEY (`address_id`)
+    REFERENCES `PaymentAssistant`.`address` (`address_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -39,8 +109,8 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_method` (
   `metodo_id` INT NOT NULL,
   `name` VARCHAR(45) NOT NULL,
   `apiURL` VARCHAR(255) NOT NULL,
-  `secret_key` VARCHAR(100) NOT NULL,
-  `key` VARCHAR(100) NOT NULL,
+  `secret_key` VARBINARY(100) NOT NULL,
+  `key` VARBINARY(100) NOT NULL,
   `logoIconURL` VARBINARY(255) NOT NULL,
   `enabled` BIT(1) NOT NULL,
   `config` JSON NOT NULL,
@@ -54,22 +124,22 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_available_method` (
   `available_method` INT NOT NULL,
   `mask_account` VARCHAR(45) NOT NULL,
-  `token` VARCHAR(45) NOT NULL,
-  `exptokendate` VARCHAR(45) NOT NULL,
+  `token` VARBINARY(50) NOT NULL,
+  `exptokendate` DATETIME NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   `user_id` INT NOT NULL,
-  `pay_method_type_metodo_id` INT NOT NULL,
+  `metodo_id` INT NOT NULL,
   PRIMARY KEY (`available_method`),
   UNIQUE INDEX `method_id_UNIQUE` (`available_method` ASC) VISIBLE,
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
-  INDEX `fk_pay_available_method_pay_method_type1_idx` (`pay_method_type_metodo_id` ASC) VISIBLE,
+  INDEX `fk_pay_available_method_pay_method_type1_idx` (`metodo_id` ASC) VISIBLE,
   CONSTRAINT `user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_pay_available_method_pay_method_type1`
-    FOREIGN KEY (`pay_method_type_metodo_id`)
+    FOREIGN KEY (`metodo_id`)
     REFERENCES `PaymentAssistant`.`pay_method` (`metodo_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -86,8 +156,26 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`schedule` (
   `repit` TINYINT NOT NULL,
   `endType` VARCHAR(45) NOT NULL,
   `repetitions` TINYINT NOT NULL,
-  `end_date` DATE NOT NULL,
+  `end_date` DATETIME NOT NULL,
   PRIMARY KEY (`schedule_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`currencies`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`currencies` (
+  `currency_id` INT NOT NULL,
+  `currency_simbol` VARCHAR(10) NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `country_id` INT NOT NULL,
+  PRIMARY KEY (`currency_id`),
+  INDEX `fk_currencies_countries1_idx` (`country_id` ASC) VISIBLE,
+  CONSTRAINT `fk_currencies_countries1`
+    FOREIGN KEY (`country_id`)
+    REFERENCES `PaymentAssistant`.`countries` (`country_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
 
@@ -100,7 +188,6 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`payments` (
   `available_method` INT NOT NULL,
   `price` DECIMAL(10,2) NOT NULL,
   `current_price` DECIMAL(10,2) NOT NULL,
-  `currency` CHAR(3) NOT NULL,
   `auth` VARCHAR(255) NOT NULL,
   `changeToken` VARCHAR(255) NOT NULL,
   `description` VARCHAR(200) NOT NULL,
@@ -109,11 +196,13 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`payments` (
   `result` ENUM('SUCCESS', 'FAILED', 'PENDING') NOT NULL,
   `checksum` BINARY(32) NOT NULL,
   `schedule_id` INT NULL,
+  `currency_id` INT NOT NULL,
   PRIMARY KEY (`payments_id`),
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
   INDEX `method_id_idx` (`available_method` ASC) VISIBLE,
   INDEX `fk_payments_schedule1_idx` (`schedule_id` ASC) VISIBLE,
-  CONSTRAINT `payments_user_id`
+  INDEX `fk_payments_currencies1_idx` (`currency_id` ASC) VISIBLE,
+  CONSTRAINT `user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
@@ -126,6 +215,11 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`payments` (
   CONSTRAINT `fk_payments_schedule1`
     FOREIGN KEY (`schedule_id`)
     REFERENCES `PaymentAssistant`.`schedule` (`schedule_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_payments_currencies1`
+    FOREIGN KEY (`currency_id`)
+    REFERENCES `PaymentAssistant`.`currencies` (`currency_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -156,7 +250,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_user_roles` (
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
   INDEX `roleid_idx` (`roleid` ASC) VISIBLE,
   PRIMARY KEY (`userrolesid`),
-  CONSTRAINT `pay_user_roles_user_id`
+  CONSTRAINT `user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
@@ -261,7 +355,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_plan_type` (
   `user_id` INT NOT NULL,
   PRIMARY KEY (`plan_type_id`),
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
-  CONSTRAINT `pay_plan_type_user_id`
+  CONSTRAINT `user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
@@ -281,20 +375,32 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `PaymentAssistant`.`recurrences`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`recurrences` (
+  `recurrences_id` INT NOT NULL,
+  `description` VARCHAR(50) NOT NULL,
+  `recurrence_num` INT NOT NULL,
+  PRIMARY KEY (`recurrences_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `PaymentAssistant`.`plan_prices`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`plan_prices` (
   `prices_id` INT NOT NULL,
   `amount` DECIMAL(6,2) NOT NULL,
-  `recurrencytype` VARCHAR(45) NOT NULL,
   `post_time` DATETIME NOT NULL,
   `endDate` DATETIME NOT NULL,
   `current` BIT(1) NOT NULL,
   `plan_type_id` INT NOT NULL,
   `subscriptions_id` INT NOT NULL,
+  `recurrences_id` INT NOT NULL,
   PRIMARY KEY (`prices_id`),
   INDEX `fk_plan_prices_pay_plan1_idx` (`plan_type_id` ASC) VISIBLE,
   INDEX `fk_plan_prices_subscriptions1_idx` (`subscriptions_id` ASC) VISIBLE,
+  INDEX `fk_plan_prices_recurrences1_idx` (`recurrences_id` ASC) VISIBLE,
   CONSTRAINT `fk_plan_prices_pay_plan1`
     FOREIGN KEY (`plan_type_id`)
     REFERENCES `PaymentAssistant`.`pay_plan_type` (`plan_type_id`)
@@ -303,6 +409,11 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`plan_prices` (
   CONSTRAINT `fk_plan_prices_subscriptions1`
     FOREIGN KEY (`subscriptions_id`)
     REFERENCES `PaymentAssistant`.`subscriptions` (`subscriptions_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_plan_prices_recurrences1`
+    FOREIGN KEY (`recurrences_id`)
+    REFERENCES `PaymentAssistant`.`recurrences` (`recurrences_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -316,7 +427,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`plan_per_user` (
   `user_id` INT NOT NULL,
   `prices_id` INT NOT NULL,
   `acquisition` DATETIME NOT NULL,
-  `enable` BIT(1) NOT NULL,
+  `enable` BIT(1) NOT NULL DEFAULT 1,
   PRIMARY KEY (`planuser_id`),
   INDEX `fk_plan_per_user_pay_user1_idx` (`user_id` ASC) VISIBLE,
   INDEX `fk_plan_per_user_plan_prices1_idx` (`prices_id` ASC) VISIBLE,
@@ -340,7 +451,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`schedule_details` (
   `details_id` INT NOT NULL,
   `deleted` BIT(1) NOT NULL,
   `baseDate:` DATE NOT NULL,
-  `datepart` DATE NOT NULL,
+  `datepart` VARCHAR(10) NOT NULL,
   `LastExecute` DATETIME NOT NULL,
   `NextExecute` DATETIME NOT NULL,
   `plan_id` INT NOT NULL,
@@ -369,15 +480,17 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PaymentAssistant`.`paymentspayment_notifications`
+-- Table `PaymentAssistant`.`payment_notifications`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`payment_notifications` (
   `notificationid` INT NOT NULL,
-  `payments_id` BIGINT UNSIGNED NOT NULL,
+  `payments_id` INT UNSIGNED NOT NULL,
   `description` VARCHAR(100) NULL,
   `enable` BIT(1) NOT NULL,
   `message` VARCHAR(70) NOT NULL,
   `details_id` INT NOT NULL,
+  `sendDate` DATETIME NOT NULL,
+  `succes` BIT(1) NULL,
   PRIMARY KEY (`notificationid`),
   INDEX `fk_payment_notifications_payment_details1_idx` (`payments_id` ASC) VISIBLE,
   INDEX `fk_payment_notifications_schedule_details1_idx` (`details_id` ASC) VISIBLE,
@@ -395,6 +508,16 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
+-- Table `PaymentAssistant`.`pay_contact_info_type`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_contact_info_type` (
+  `infotype_id` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`infotype_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
 -- Table `PaymentAssistant`.`pay_contact`
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_contact` (
@@ -403,12 +526,19 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_contact` (
   `value` VARCHAR(100) NOT NULL,
   `enabled` BIT(1) NOT NULL,
   `last_update` DATETIME NOT NULL,
+  `infotype_id` INT NOT NULL,
   PRIMARY KEY (`contact_id`),
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
   UNIQUE INDEX `contact_id_UNIQUE` (`contact_id` ASC) VISIBLE,
-  CONSTRAINT `pay_contact_user_id`
+  INDEX `fk_pay_contact_pay_contact_info_type1_idx` (`infotype_id` ASC) VISIBLE,
+  CONSTRAINT `user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_pay_contact_pay_contact_info_type1`
+    FOREIGN KEY (`infotype_id`)
+    REFERENCES `PaymentAssistant`.`pay_contact_info_type` (`infotype_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -432,22 +562,35 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PaymentAssistant`.`userbalance`
+-- Table `PaymentAssistant`.`transactionType`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`userbalance` (
-  `balanceid` INT NOT NULL AUTO_INCREMENT,
-  `user_id` INT NOT NULL,
-  `balance` DECIMAL(10,2) NOT NULL,
-  `lastbalance` DECIMAL(10,2) NOT NULL,
-  `freezeamount` DECIMAL(10,2) NOT NULL,
-  `lastupdate` DATETIME NOT NULL,
-  `checksum` VARBINARY(32) NOT NULL,
-  `last_update` DATETIME NOT NULL,
-  PRIMARY KEY (`balanceid`),
-  INDEX `fk_userbalance_pay_user1_idx` (`user_id` ASC) VISIBLE,
-  CONSTRAINT `fk_userbalance_pay_user1`
-    FOREIGN KEY (`user_id`)
-    REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`transactionType` (
+  `transactionType_id` INT NOT NULL,
+  `name` VARCHAR(45) NULL,
+  PRIMARY KEY (`transactionType_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`exchangeRate`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`exchangeRate` (
+  `exchangeRate_id` INT NOT NULL,
+  `fromCurrency_id` INT NOT NULL,
+  `toCurrency_id` INT NOT NULL,
+  `date` DATETIME NOT NULL,
+  `changeRate` DECIMAL(10,6) NOT NULL,
+  PRIMARY KEY (`exchangeRate_id`),
+  INDEX `fromCurrency_idx` (`fromCurrency_id` ASC) VISIBLE,
+  INDEX `toCurrency_idx` (`toCurrency_id` ASC) VISIBLE,
+  CONSTRAINT `fromCurrency`
+    FOREIGN KEY (`fromCurrency_id`)
+    REFERENCES `PaymentAssistant`.`currencies` (`currency_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `toCurrency`
+    FOREIGN KEY (`toCurrency_id`)
+    REFERENCES `PaymentAssistant`.`currencies` (`currency_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -458,8 +601,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`transactions` (
   `transaction_id` INT NOT NULL AUTO_INCREMENT,
-  `balanceid` INT NOT NULL,
-  `payments_id` INT NOT NULL,
+  `payments_id` INT NULL,
   `user_id` INT NOT NULL,
   `amount` DECIMAL(10,2) NOT NULL,
   `description` VARCHAR(100) NOT NULL,
@@ -467,41 +609,38 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`transactions` (
   `post_time` DATETIME NOT NULL,
   `checksum` VARBINARY(32) NOT NULL,
   `ref_number` VARCHAR(255) NOT NULL,
+  `currency_id` INT NOT NULL,
+  `transactionType_id` INT NOT NULL,
+  `exchangeRate_id` INT NOT NULL,
   PRIMARY KEY (`transaction_id`),
   INDEX `payments_id_idx` (`payments_id` ASC) VISIBLE,
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
-  INDEX `fk_transactions_userbalance1_idx` (`balanceid` ASC) VISIBLE,
+  INDEX `fk_transactions_currencies1_idx` (`currency_id` ASC) VISIBLE,
+  INDEX `fk_transactions_transactionType1_idx` (`transactionType_id` ASC) VISIBLE,
+  INDEX `fk_transactions_exchangeRate1_idx` (`exchangeRate_id` ASC) VISIBLE,
   CONSTRAINT `payments_id`
     FOREIGN KEY (`payments_id`)
     REFERENCES `PaymentAssistant`.`payments` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `transactions_user_id`
+  CONSTRAINT `user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_transactions_userbalance1`
-    FOREIGN KEY (`balanceid`)
-    REFERENCES `PaymentAssistant`.`userbalance` (`balanceid`)
+  CONSTRAINT `fk_transactions_currencies1`
+    FOREIGN KEY (`currency_id`)
+    REFERENCES `PaymentAssistant`.`currencies` (`currency_id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PaymentAssistant`.`features_per_plan`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`features_per_plan` (
-  `featuresPerPlan_id` INT NOT NULL,
-  `value` VARCHAR(45) NOT NULL,
-  `enable` BIT(1) NOT NULL,
-  `subscriptions_id` INT NOT NULL,
-  PRIMARY KEY (`featuresPerPlan_id`),
-  INDEX `fk_features_plan_subscriptions1_idx` (`subscriptions_id` ASC) VISIBLE,
-  CONSTRAINT `fk_features_plan_subscriptions1`
-    FOREIGN KEY (`subscriptions_id`)
-    REFERENCES `PaymentAssistant`.`subscriptions` (`subscriptions_id`)
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_transactions_transactionType1`
+    FOREIGN KEY (`transactionType_id`)
+    REFERENCES `PaymentAssistant`.`transactionType` (`transactionType_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_transactions_exchangeRate1`
+    FOREIGN KEY (`exchangeRate_id`)
+    REFERENCES `PaymentAssistant`.`exchangeRate` (`exchangeRate_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -515,29 +654,30 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`features_plan` (
   `description` VARCHAR(45) NOT NULL,
   `enabled` BIT(1) NOT NULL,
   `dataypte` VARCHAR(45) NOT NULL,
-  `featuresPerPlan_id` INT NOT NULL,
-  PRIMARY KEY (`features_id`),
-  INDEX `fk_features_plan_features_per_plan1_idx` (`featuresPerPlan_id` ASC) VISIBLE,
-  CONSTRAINT `fk_features_plan_features_per_plan1`
-    FOREIGN KEY (`featuresPerPlan_id`)
-    REFERENCES `PaymentAssistant`.`features_per_plan` (`featuresPerPlan_id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+  PRIMARY KEY (`features_id`))
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `PaymentAssistant`.`pay_contact_info_type`
+-- Table `PaymentAssistant`.`features_per_plan`
 -- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_contact_info_type` (
-  `infotype_id` INT NOT NULL,
-  `name` VARCHAR(45) NOT NULL,
-  `contact_id` INT NOT NULL,
-  PRIMARY KEY (`infotype_id`),
-  INDEX `fk_pay_contact_info_type_pay_contact1_idx` (`contact_id` ASC) VISIBLE,
-  CONSTRAINT `fk_pay_contact_info_type_pay_contact1`
-    FOREIGN KEY (`contact_id`)
-    REFERENCES `PaymentAssistant`.`pay_contact` (`contact_id`)
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`features_per_plan` (
+  `featuresPerPlan_id` INT NOT NULL,
+  `value` VARCHAR(45) NOT NULL,
+  `enable` BIT(1) NOT NULL,
+  `subscriptions_id` INT NOT NULL,
+  `plan_features_id` INT NOT NULL,
+  PRIMARY KEY (`featuresPerPlan_id`),
+  INDEX `fk_features_plan_subscriptions1_idx` (`subscriptions_id` ASC) VISIBLE,
+  INDEX `fk_features_per_plan_features_plan1_idx` (`plan_features_id` ASC) VISIBLE,
+  CONSTRAINT `fk_features_plan_subscriptions1`
+    FOREIGN KEY (`subscriptions_id`)
+    REFERENCES `PaymentAssistant`.`subscriptions` (`subscriptions_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_features_per_plan_features_plan1`
+    FOREIGN KEY (`plan_features_id`)
+    REFERENCES `PaymentAssistant`.`features_plan` (`features_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -548,16 +688,50 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_culture` (
   `culture_id` INT NOT NULL,
-  `currency` VARCHAR(15) NOT NULL,
-  `language` VARCHAR(15) NOT NULL,
-  `pay_country_country_id` INT NOT NULL,
+  `currency` VARCHAR(45) NOT NULL,
+  `language` VARCHAR(45) NOT NULL,
+  `country_id` INT NOT NULL,
   PRIMARY KEY (`culture_id`),
-  INDEX `fk_pay_culture_pay_country1_idx` (`pay_country_country_id` ASC) VISIBLE,
+  INDEX `fk_pay_culture_pay_country1_idx` (`country_id` ASC) VISIBLE,
   CONSTRAINT `fk_pay_culture_pay_country1`
-    FOREIGN KEY (`pay_country_country_id`)
+    FOREIGN KEY (`country_id`)
     REFERENCES `PaymentAssistant`.`pay_country` (`country_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`logserenty`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`logserenty` (
+  `logsrentyid` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`logsrentyid`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`logtypes`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`logtypes` (
+  `logtypeid` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  `ref1Desc` VARCHAR(100) NOT NULL,
+  `ref2Desc` VARCHAR(100) NOT NULL,
+  `value1Desc` VARCHAR(100) NOT NULL,
+  `value2Desc` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`logtypeid`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`logsources`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`logsources` (
+  `logsourcesid` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`logsourcesid`))
 ENGINE = InnoDB;
 
 
@@ -578,66 +752,32 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`logs` (
   `checksum` VARCHAR(255) NOT NULL,
   `logscol` VARCHAR(45) NOT NULL,
   `user_id` INT NOT NULL,
+  `logserenty_logsrentyid` INT NOT NULL,
+  `logtypeid` INT NOT NULL,
+  `logsourcesid` INT NOT NULL,
   PRIMARY KEY (`logsid`),
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
-  CONSTRAINT `logs_user_id`
+  INDEX `fk_logs_logserenty1_idx` (`logserenty_logsrentyid` ASC) VISIBLE,
+  INDEX `fk_logs_logtypes1_idx` (`logtypeid` ASC) VISIBLE,
+  INDEX `fk_logs_logsources1_idx` (`logsourcesid` ASC) VISIBLE,
+  CONSTRAINT `user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PaymentAssistant`.`logtypes`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`logtypes` (
-  `logtypeid` INT NOT NULL,
-  `name` VARCHAR(45) NOT NULL,
-  `ref1Desc` VARCHAR(100) NOT NULL,
-  `ref2Desc` VARCHAR(100) NOT NULL,
-  `value1Desc` VARCHAR(100) NOT NULL,
-  `value2Desc` VARCHAR(100) NOT NULL,
-  `logs_logsid` INT NOT NULL,
-  PRIMARY KEY (`logtypeid`),
-  INDEX `fk_logtypes_logs1_idx` (`logs_logsid` ASC) VISIBLE,
-  CONSTRAINT `fk_logtypes_logs1`
-    FOREIGN KEY (`logs_logsid`)
-    REFERENCES `PaymentAssistant`.`logs` (`logsid`)
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_logs_logserenty1`
+    FOREIGN KEY (`logserenty_logsrentyid`)
+    REFERENCES `PaymentAssistant`.`logserenty` (`logsrentyid`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PaymentAssistant`.`logsources`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`logsources` (
-  `logsourcesid` INT NOT NULL,
-  `name` VARCHAR(45) NOT NULL,
-  `logsid` INT NOT NULL,
-  PRIMARY KEY (`logsourcesid`),
-  INDEX `fk_logsources_logs1_idx` (`logsid` ASC) VISIBLE,
-  CONSTRAINT `fk_logsources_logs1`
-    FOREIGN KEY (`logsid`)
-    REFERENCES `PaymentAssistant`.`logs` (`logsid`)
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_logs_logtypes1`
+    FOREIGN KEY (`logtypeid`)
+    REFERENCES `PaymentAssistant`.`logtypes` (`logtypeid`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `PaymentAssistant`.`logserenty`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`logserenty` (
-  `logsrentyid` INT NOT NULL,
-  `name` VARCHAR(45) NOT NULL,
-  `logsid` INT NOT NULL,
-  PRIMARY KEY (`logsrentyid`),
-  INDEX `fk_logserenty_logs1_idx` (`logsid` ASC) VISIBLE,
-  CONSTRAINT `fk_logserenty_logs1`
-    FOREIGN KEY (`logsid`)
-    REFERENCES `PaymentAssistant`.`logs` (`logsid`)
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_logs_logsources1`
+    FOREIGN KEY (`logsourcesid`)
+    REFERENCES `PaymentAssistant`.`logsources` (`logsourcesid`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
@@ -655,6 +795,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`ia_session` (
   `status` ENUM('active', 'completed', 'failed') NOT NULL,
   `api_url` VARCHAR(255) NOT NULL,
   `config` JSON NOT NULL,
+  `audioURL` VARCHAR(225) NOT NULL,
   PRIMARY KEY (`session_id`),
   INDEX `fk_ai_request_pay_user1_idx` (`user_id` ASC) VISIBLE,
   CONSTRAINT `fk_ai_request_pay_user1`
@@ -682,10 +823,15 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`ia_interactions` (
   `interactions_id` INT NOT NULL AUTO_INCREMENT,
   `session_id` INT NOT NULL,
   `type_id` INT NOT NULL,
-  `ia_answer` VARCHAR(255) NOT NULL,
   `audio_transcription` VARCHAR(255) NOT NULL,
   `date` DATETIME NOT NULL,
   `result` ENUM("ERROR", "CONFIRMED", "CANCELLED", "REPEAT") NOT NULL,
+  `detectedBank` ENUM("Banco Popular", "BCR", "Banco Nacional", "BAC", "Scotiabank", "CityBank", "Paypal") NOT NULL,
+  `detectedRecipient` VARCHAR(225) NOT NULL,
+  `detectedAmount` DECIMAL(10,2) NOT NULL,
+  `amountAccuracy` DECIMAL(10,2) NOT NULL,
+  `recipientAccuracy` DECIMAL(10,2) NOT NULL,
+  `bankAccuracy` DECIMAL(10,2) NOT NULL,
   PRIMARY KEY (`interactions_id`),
   INDEX `fk_ia_interactions_ia_request1_idx` (`session_id` ASC) VISIBLE,
   INDEX `fk_ia_interactions_ia_type1_idx` (`type_id` ASC) VISIBLE,
@@ -721,6 +867,86 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`user_plan_limit` (
   CONSTRAINT `fk_user_plan_limit_features_per_plan1`
     FOREIGN KEY (`featuresPerPlan_id`)
     REFERENCES `PaymentAssistant`.`features_per_plan` (`featuresPerPlan_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`mediaFile_types`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`mediaFile_types` (
+  `mediaFileType_id` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`mediaFileType_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`media_files`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`media_files` (
+  `file_id` INT NOT NULL,
+  `mediaFileType_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `size` BIGINT(100) NOT NULL,
+  PRIMARY KEY (`file_id`),
+  INDEX `fk_media_files_mediaFile_types1_idx` (`mediaFileType_id` ASC) VISIBLE,
+  INDEX `fk_media_files_pay_user1_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_media_files_mediaFile_types1`
+    FOREIGN KEY (`mediaFileType_id`)
+    REFERENCES `PaymentAssistant`.`mediaFile_types` (`mediaFileType_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_media_files_pay_user1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`IA_proccessing`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`IA_proccessing` (
+  `procces_id` INT NOT NULL,
+  `description` VARCHAR(45) NOT NULL,
+  `trigger` VARCHAR(45) NOT NULL,
+  `result` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`procces_id`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `PaymentAssistant`.`IA_logs`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`IA_logs` (
+  `IAlogs_id` INT NOT NULL,
+  `description` VARCHAR(45) NOT NULL,
+  `interactions_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `procces_id` INT NOT NULL,
+  `userTaps` INT NOT NULL,
+  `errorDetail` INT NOT NULL,
+  `userCorrections` TIMESTAMP NOT NULL,
+  PRIMARY KEY (`IAlogs_id`),
+  INDEX `fk_IA_logs_ia_interactions1_idx` (`interactions_id` ASC) VISIBLE,
+  INDEX `fk_IA_logs_pay_user1_idx` (`user_id` ASC) VISIBLE,
+  INDEX `fk_IA_logs_IA_proccessing1_idx` (`procces_id` ASC) VISIBLE,
+  CONSTRAINT `fk_IA_logs_ia_interactions1`
+    FOREIGN KEY (`interactions_id`)
+    REFERENCES `PaymentAssistant`.`ia_interactions` (`interactions_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_IA_logs_pay_user1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_IA_logs_IA_proccessing1`
+    FOREIGN KEY (`procces_id`)
+    REFERENCES `PaymentAssistant`.`IA_proccessing` (`procces_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
