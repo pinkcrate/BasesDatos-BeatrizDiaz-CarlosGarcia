@@ -1,4 +1,5 @@
-INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,`birth`,`password`,`delete`,`last_update`, `active`, `email`, `region`) VALUES (1, 'nombre1', 'apellido1', '1111-1111', '1970-01-01', '1', 0, now(), 1,'1@gmail.com','CR');
+INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,`birth`,`password`,`delete`,`last_update`, `active`, `email`, `address_id`) 
+VALUES (1, 'nombre1', 'apellido1', '1111-1111', '1970-01-01', '1', 0, now(), 1,'1@gmail.com', 1);
 INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,`birth`,`password`,`delete`,`last_update`, `active`, `email`, `region`) VALUES (2, 'nombre2', 'apellido2', '1111-1112', '1970-01-02', '1', 0, now(), 1,'2@gmail.com','CR');
 INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,`birth`,`password`,`delete`,`last_update`, `active`, `email`, `region`) VALUES (3, 'nombre3', 'apellido3', '1111-1113', '1970-01-03', '1', 0, now(), 1,'1@gmail.com','CR');
 INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,`birth`,`password`,`delete`,`last_update`, `active`, `email`, `region`) VALUES (4, 'nombre4', 'apellido4', '1111-1114', '1970-01-04', '1', 0, now(), 1,'2@gmail.com','CR');
@@ -18,5 +19,4 @@ INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,
 INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,`birth`,`password`,`delete`,`last_update`, `active`, `email`, `region`) VALUES (18, 'nombre18', 'apellido18', '1111-1128', '1970-01-18', '1', 0, now(), 1,'2@gmail.com','CR');
 INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,`birth`,`password`,`delete`,`last_update`, `active`, `email`, `region`) VALUES (19, 'nombre19', 'apellido19', '1111-1129', '1970-01-19', '1', 0, now(), 1,'1@gmail.com','CR');
 INSERT INTO `paymentassistant`.`pay_user` (`user_id`,`name`,`last_name`,`phone`,`birth`,`password`,`delete`,`last_update`, `active`, `email`, `region`) VALUES (20, 'nombre20', 'apellido20', '1111-1130', '1970-01-20', '1', 0, now(), 1,'2@gmail.com','CR');
-select * from pay_user ;
 

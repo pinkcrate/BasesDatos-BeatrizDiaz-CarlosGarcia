@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`region` (
   `country_id` INT NOT NULL,
   PRIMARY KEY (`region_id`),
   INDEX `fk_region_countries1_idx` (`country_id` ASC) VISIBLE,
-  CONSTRAINT `fk_region_countries1`
+  CONSTRAINT `region_fk_region_countries1`
     FOREIGN KEY (`country_id`)
     REFERENCES `PaymentAssistant`.`countries` (`country_id`)
     ON DELETE NO ACTION
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`payments` (
   INDEX `method_id_idx` (`available_method` ASC) VISIBLE,
   INDEX `fk_payments_schedule1_idx` (`schedule_id` ASC) VISIBLE,
   INDEX `fk_payments_currencies1_idx` (`currency_id` ASC) VISIBLE,
-  CONSTRAINT `user_id`
+  CONSTRAINT `payments_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
@@ -250,7 +250,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_user_roles` (
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
   INDEX `roleid_idx` (`roleid` ASC) VISIBLE,
   PRIMARY KEY (`userrolesid`),
-  CONSTRAINT `user_id`
+  CONSTRAINT `pay_user_roles_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
@@ -355,7 +355,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_plan_type` (
   `user_id` INT NOT NULL,
   PRIMARY KEY (`plan_type_id`),
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
-  CONSTRAINT `user_id`
+  CONSTRAINT `pay_plan_type_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
@@ -484,7 +484,7 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`payment_notifications` (
   `notificationid` INT NOT NULL,
-  `payments_id` INT UNSIGNED NOT NULL,
+  `payments_id` BIGINT UNSIGNED NOT NULL,
   `description` VARCHAR(100) NULL,
   `enable` BIT(1) NOT NULL,
   `message` VARCHAR(70) NOT NULL,
@@ -531,7 +531,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`pay_contact` (
   INDEX `user_id_idx` (`user_id` ASC) VISIBLE,
   UNIQUE INDEX `contact_id_UNIQUE` (`contact_id` ASC) VISIBLE,
   INDEX `fk_pay_contact_pay_contact_info_type1_idx` (`infotype_id` ASC) VISIBLE,
-  CONSTRAINT `user_id`
+  CONSTRAINT `pay_contact_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
@@ -623,7 +623,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`transactions` (
     REFERENCES `PaymentAssistant`.`payments` (`user_id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `user_id`
+  CONSTRAINT `transactions_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
@@ -760,7 +760,7 @@ CREATE TABLE IF NOT EXISTS `PaymentAssistant`.`logs` (
   INDEX `fk_logs_logserenty1_idx` (`logserenty_logsrentyid` ASC) VISIBLE,
   INDEX `fk_logs_logtypes1_idx` (`logtypeid` ASC) VISIBLE,
   INDEX `fk_logs_logsources1_idx` (`logsourcesid` ASC) VISIBLE,
-  CONSTRAINT `user_id`
+  CONSTRAINT `logs_user_id`
     FOREIGN KEY (`user_id`)
     REFERENCES `PaymentAssistant`.`pay_user` (`user_id`)
     ON DELETE NO ACTION
