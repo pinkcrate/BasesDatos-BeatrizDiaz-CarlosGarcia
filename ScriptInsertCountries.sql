@@ -27,5 +27,18 @@ VALUES
 (7, 'Limón', 7),
 (8, 'Bocas del Toro (Ciudad)', 8),
 (9, 'Barrio Norte', 9);
+INSERT INTO`paymentassistant`.`city` (`city_id`,`name`,`region_id`) VALUE (10, 'Moravia', 1);
+INSERT INTO`paymentassistant`.`city` (`city_id`,`name`,`region_id`) VALUE (11, 'Cartago', 3);
 
-select * from city
+INSERT INTO `paymentassistant`.`address` (`address_id`, `linea1`, `linea2`, `postalCode`, `city_id`) VALUES
+(1, 'Frente al Tec', 'Avenida 12', 11501, 1),  
+(2, 'Calle Principal', 'Frente al parque central', 20201, 2),  
+(3, 'Costado sur de la iglesia', 'Avenida Central', 30501, 3), 
+(4, '100 metros norte del supermercado', 'Calle 5', 40201, 4), 
+(5, 'Frente a la playa', 'Calle El Faro', 50201, 5),  
+(6, 'Junto al muelle', 'Avenida del Mar', 60601, 6),  
+(7, 'Detrás del mercado municipal', 'Bulevar costero', 70101, 7),
+(8, 'Isla Colón', 'Calle 3ra', 0101, 8), 
+(9, 'Zona comercial', 'Avenida Las Flores', 10101, 9); 
+
+
