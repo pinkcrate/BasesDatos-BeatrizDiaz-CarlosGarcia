@@ -20,3 +20,4 @@ VALUES
 (18, 'Lucía', 'Flores', '1991-12-24', 'lucia789', 0, NOW(), 1, 'lflores@yahoo.com', 9),
 (19, 'Manuel', 'Silva', '1986-09-07', 'manuel123', 0, NOW(), 1, 'msilva@hotmail.com', 1),
 (20, 'Adriana', 'Chaves', '1999-03-19', 'adriana456', 0, NOW(), 1, 'achaves@gmail.com', 2);
+select * from pay_user;

@@ -10,11 +10,11 @@ VALUES
 
 INSERT INTO `paymentassistant`.`schedule` (`schedule_id`, `name`, `recurrencyType:`, `repit`, `endType`, `repetitions`, `end_date`)
 VALUES
-(1, 'Monthly Rent', 'Monthly', 1, 'date', NULL, '2024-12-31 23:59:59'),
-(2, 'Weekly Meeting', 'Weekly', 1, 'repetitions', 12, NULL),
-(3, 'Bi-weekly Payroll', 'Weekly', 2, 'date', NULL, '2025-12-31 23:59:59'),
-(4, 'Quarterly Report', 'Quarterly', 1, 'repetitions', 4, NULL),
-(5, 'Annual Review', 'Yearly', 1, 'date', NULL, '2030-12-31 23:59:59');
+(1, 'Monthly Rent', 'Monthly', 1, 'date', 0, '2024-12-31 23:59:59'),
+(2, 'Weekly Meeting', 'Weekly', 1, 'repetitions', 12, '2030-12-31 23:59:59'),
+(3, 'Bi-weekly Payroll', 'Weekly', 2, 'date', 0, '2025-12-31 23:59:59'),
+(4, 'Quarterly Report', 'Quarterly', 1, 'repetitions', 4, '2030-12-31 23:59:59'),
+(5, 'Annual Review', 'Yearly', 1, 'date', 0, '2030-12-31 23:59:59');
 
 INSERT INTO `paymentassistant`.`subscriptions` (`subscriptions_id`, `description`, `logourl`)
 VALUES
@@ -78,11 +78,11 @@ VALUES
 INSERT INTO `paymentassistant`.`payments` 
 (`payments_id`, `user_id`, `available_method`, `price`, `current_price`, `auth`, `changeToken`, `description`, `error`, `date`, `result`, `checksum`, `schedule_id`, `currency_id`)
 VALUES
-(1001, 5, 1, 49.99, 49.99, 'AUTH12345XYZ', 'TOKEN_ABC123', 'Premium Plan Subscription', 0, '2023-10-15 14:30:22', 'completed', UNHEX(SHA2('PAY1001', 256)), 1, 1),
-(1002, 8, 2, 9.99, 9.99, 'AUTH67890ABC', 'TOKEN_DEF456', 'Monthly Donation', 1, '2023-10-16 09:15:47', 'failed', UNHEX(SHA2('PAY1002', 256)), 3, 2),
-(1003, 12, 3, 100.00, 95.50, 'AUTH24680XYZ', 'TOKEN_GHI789', 'USD to EUR Conversion', 0, '2023-10-17 16:45:33', 'pending', UNHEX(SHA2('PAY1003', 256)), NULL, 3),
-(1004, 3, 1, 29.99, 29.99, 'AUTH13579ACD', 'TOKEN_JKL012', 'Service Fee', 0, '2023-10-18 11:20:18', 'completed', UNHEX(SHA2('PAY1004', 256)), 5, 1),
-(1005, 7, 4, 19.99, -19.99, 'AUTH86420FGH', 'TOKEN_MNO345', 'Customer Refund', 0, '2023-10-19 13:10:05', 'refunded', UNHEX(SHA2('PAY1005', 256)), NULL, 2);
+(1001, 5, 1, 49.99, 49.99, 'AUTH12345XYZ', 'TOKEN_ABC123', 'Premium Plan Subscription', 0, '2023-10-15 14:30:22', 'SUCCESS', UNHEX(SHA2('PAY1001', 256)), 1, 1),
+(1002, 8, 2, 9.99, 9.99, 'AUTH67890ABC', 'TOKEN_DEF456', 'Monthly Donation', 1, '2023-10-16 09:15:47', 'FAILED', UNHEX(SHA2('PAY1002', 256)), 3, 2),
+(1003, 12, 3, 100.00, 95.50, 'AUTH24680XYZ', 'TOKEN_GHI789', 'USD to EUR Conversion', 0, '2023-10-17 16:45:33', 'PENDING', UNHEX(SHA2('PAY1003', 256)), NULL, 2),
+(1004, 3, 1, 29.99, 29.99, 'AUTH13579ACD', 'TOKEN_JKL012', 'Service Fee', 0, '2023-10-18 11:20:18', 'SUCCESS', UNHEX(SHA2('PAY1004', 256)), 5, 1),
+(1005, 7, 4, 19.99, -19.99, 'AUTH86420FGH', 'TOKEN_MNO345', 'Customer Refund', 0, '2023-10-19 13:10:05', 'FAILED', UNHEX(SHA2('PAY1005', 256)), NULL, 2);
 
 INSERT INTO `paymentassistant`.`transactions` 
 (`transaction_id`, `payments_id`, `user_id`, `amount`, `description`, `transaction_date`, `post_time`, `checksum`, `ref_number`, `currency_id`, `transactionType_id`, `exchangeRate_id`)
