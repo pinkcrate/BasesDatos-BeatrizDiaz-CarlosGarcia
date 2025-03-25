@@ -38,7 +38,7 @@ VALUES
 (10, 'Notice');
 
 INSERT INTO `paymentassistant`.`logs` 
-(`logsid`, `description`, `posttime`, `computer`, `username`, `trace`, `referenceld1`, `referenceld2`,`value1`, `value2`, `checksum`, `logscol`, `user_id`, `logserenty_logsrentyid`, `logtypeid`, `logsourcesid`)
+(`logsid`, `description`, `posttime`, `computer`, `username`, `trace`, `referenceid1`, `referenceid2`,`value1`, `value2`, `checksum`, `logscol`, `user_id`, `logserenty_logsrentyid`, `logtypeid`, `logsourcesid`)
 VALUES
 (1, 'Payment processed successfully', '2023-10-15 09:30:45', 'SRV-PAY-01', 'johndoe', 'TX-1001', 7, 5, '49.99', 'USD', SHA2('LOG1', 256), 'payment', 3, 2, 4, 6),
 (2, 'Failed login attempt detected', '2023-10-15 10:15:22', 'MOB-APP', 'system', 'AUTH-ERR', 2, 8,'Android', 'Invalid credentials', SHA2('LOG2', 256), 'security', 5, 3, 7, 2),
