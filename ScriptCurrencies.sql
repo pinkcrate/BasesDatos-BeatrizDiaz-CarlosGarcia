@@ -170,3 +170,18 @@ VALUES
 (2, 'CR123456789', 'tok_bac_xyz456', DATE_ADD(NOW(), INTERVAL 2 YEAR), 'Cuenta BAC', 1, 3),
 (3, '1234-6666', 'tok_yappy_pqr789', DATE_ADD(NOW(), INTERVAL 1 YEAR), 'Yappy Personal', 2, 2),
 (4, 'PA987654321', 'tok_bgeneral_uvw321', DATE_ADD(NOW(), INTERVAL 2 YEAR), 'Cuenta Banco General', 2, 3);
+
+INSERT INTO `paymentassistant`.`features_per_plan` 
+(`featuresPerPlan_id`, `value`, `enable`, `subscriptions_id`, `plan_features_id`)
+VALUES
+(1, '10', 1, 1, 1),
+(2, '1', 1, 1, 2),
+(3, '5', 0, 1, 3),
+(4, '2', 1, 1, 4),
+(5, '100', 1, 2, 1),
+(6, '3', 0, 2, 3),
+(7, '1', 1, 2, 4),
+(8, '1', 0, 2, 5),
+(9, '500', 1, 3, 1),
+(10, '5', 1, 3, 3);
+
