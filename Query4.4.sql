@@ -1,13 +1,10 @@
-SELECT 
-    p.description AS problema,
-    COUNT(*) AS cantidad_ocurrencias
-FROM 
+SELECT
+    l.IAlogs_id,
+    l.description AS error,
+    l.errorDetail AS codigo
+FROM
     iA_logs l
-JOIN 
-    ia_proccessing p ON l.procces_id = p.procces_id
-WHERE 
-    l.errorDetail IS NOT NULL AND l.userCorrections IS NOT NULL
-GROUP BY 
-    p.description
-ORDER BY 
-    cantidad_ocurrencias DESC;
+WHERE
+    l.errorDetail IS NOT NULL
+ORDER BY
+    l.IAlogs_id DESC;

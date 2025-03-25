@@ -1,11 +1,11 @@
 SELECT 
-    u.nombre,
-    u.apellido,
+    u.name,
+    u.last_name,
     u.email
 FROM 
-    usuario u
+    pay_user u
 JOIN 
-    plan_per_user ppu ON u.usuario_id = ppu.usuario_id
+    plan_per_user ppu ON u.user_id = ppu.user_id
 JOIN 
     plan_prices pp ON ppu.prices_id = pp.prices_id
 WHERE 

@@ -3,7 +3,7 @@ SELECT
     u.last_name, 
     u.email, 
     c.name AS country, 
-    SUM(p.price * cur.exchange_rate) AS total_paid_colones
+    SUM(p.price) AS total_paid_colones
 FROM 
     pay_user u
 JOIN 
@@ -17,7 +17,7 @@ JOIN
 JOIN 
     payments p ON u.user_id = p.user_id
 JOIN 
-    currency cur ON p.currency_id = cur.currency_id
+    currencies cur ON p.currency_id = cur.currency_id
 WHERE 
     u.active = 1 AND p.date >= '2024-01-01'
 GROUP BY 
