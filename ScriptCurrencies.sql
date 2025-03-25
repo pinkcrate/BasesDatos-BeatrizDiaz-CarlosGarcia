@@ -120,3 +120,53 @@ VALUES
 (8, 80, 8, 8),
 (9, 90, 9, 9),
 (10, 100, 10, 10);
+
+INSERT INTO `paymentassistant`.`pay_country` (`country_id`, `name`, `contact_id`) VALUES
+(1, 'Costa Rica', 1),
+(2, 'Panamá', 2);
+
+INSERT INTO `paymentassistant`.`pay_contact_info_type` (`infotype_id`, `name`) VALUES
+(1, 'Teléfono móvil'),
+(2, 'Teléfono fijo'),
+(3, 'Correo electrónico'),
+(4, 'Dirección física'),
+(5, 'WhatsApp'),
+(6, 'Facebook'),
+(7, 'LinkedIn'),
+(8, 'Twitter'),
+(9, 'Instagram'),
+(10, 'Skype');
+
+INSERT INTO `paymentassistant`.`pay_contact` (`contact_id`, `user_id`, `value`, `enabled`, `last_update`, `infotype_id`) VALUES
+(1, 1, '8888-8888', 1, NOW(), 1),
+(2, 1, 'carlos@example.com', 1, NOW(), 3),
+(3, 2, '8888-8881', 1, NOW(), 1),
+(4, 2, 'maria@example.com', 1, NOW(), 3),
+(5, 3, '8888-8882', 1, NOW(), 1),
+(6, 3, 'juan@example.com', 1, NOW(), 3),
+(7, 4, '8888-8883', 1, NOW(), 1),
+(8, 4, 'ana@example.com', 1, NOW(), 3),
+(9, 5, '8888-8884', 1, NOW(), 1),
+(10, 5, 'luis@example.com', 1, NOW(), 3),
+(11, 6, '8888-8885', 1, NOW(), 1),
+(12, 6, 'sofia@example.com', 1, NOW(), 3),
+(13, 7, '8888-8886', 1, NOW(), 1),
+(14, 7, 'diego@example.com', 1, NOW(), 3);
+
+INSERT INTO `paymentassistant`.`pay_culture` (`culture_id`, `currency_id`, `language`, `country_id`) VALUES
+(1, 1, 'Español', 1), 
+(2, 2, 'Español', 2); 
+
+INSERT INTO `pay_method` (`metodo_id`, `name`, `apiURL`, `secret_key`, `key`, `logoIconURL`, `enabled`, `config`) VALUES
+(1, 'Sinpe Móvil', 'https://api.sinpe.cr', UNHEX('73696E706531'), UNHEX('6B657931'), UNHEX('6C6F676F31'), 1, '{"pais":"CR","fee":0.8}'),
+(2, 'Yappy', 'https://api.yappy.pa', UNHEX('796170707931'), UNHEX('6B657932'), UNHEX('6C6F676F32'), 1, '{"pais":"PA","fee":1.0}'),
+(3, 'Transferencia', NULL, NULL, NULL, NULL, 1, '{"pais":"CR,PA","fee":0}'),
+(4, 'Efectivo', NULL, NULL, NULL, NULL, 1, '{"pais":"CR,PA","instructions":"Pagar en local"}'),
+(5, 'PayPal', 'https://api.paypal.com', UNHEX('70617970616C'), UNHEX('6B657935'), UNHEX('6C6F676F35'), 1, '{"pais":"CR,PA","fee":2.9}');
+
+INSERT INTO `pay_available_method` (`available_method`, `mask_account`, `token`, `exptokendate`, `name`, `user_id`, `metodo_id`) 
+VALUES
+(1, '5678-8888', 'tok_sinpe_abc123', DATE_ADD(NOW(), INTERVAL 1 YEAR), 'Sinpe Personal', 1, 1),
+(2, 'CR123456789', 'tok_bac_xyz456', DATE_ADD(NOW(), INTERVAL 2 YEAR), 'Cuenta BAC', 1, 3),
+(3, '1234-6666', 'tok_yappy_pqr789', DATE_ADD(NOW(), INTERVAL 1 YEAR), 'Yappy Personal', 2, 2),
+(4, 'PA987654321', 'tok_bgeneral_uvw321', DATE_ADD(NOW(), INTERVAL 2 YEAR), 'Cuenta Banco General', 2, 3);
