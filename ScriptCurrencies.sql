@@ -185,14 +185,13 @@ VALUES
 (9, '500', 1, 3, 1),
 (10, '5', 1, 3, 3);
 
-INSERT INTO schedule_details (details_id, deleted, baseDate, datepart, LastExecute, NextExecute, plan_id, schedule_id,planner_id) VALUES
+INSERT INTO `schedule_details` (`details_id`, `deleted`, `baseDate:`, `datepart`, `LastExecute`, `NextExecute`, `plan_id`, `schedule_id`,`planuser_id`) VALUES
 (1, 0, '2023-11-01', 'month', '2023-11-01 09:00:00', '2023-12-01 09:00:00', 101, 201, 1),
 (2, 0, '2023-11-06', 'week', '2023-11-06 08:30:00', '2023-11-13 08:30:00', 102, 202, 1),
 (3, 0, '2023-11-15', 'day', '2023-11-15 10:00:00', '2023-11-16 10:00:00', 103, 203, 2),
 (4, 0, '2023-12-25', 'year', '2022-12-25 00:01:00', '2023-12-25 00:01:00', 104, 204, 3),
-(5, 1, '2023-10-01', 'month', '2023-10-01 09:00:00', NULL, 105, 205, 2),
-(6, 0, '2023-11-15', 'custom', '2023-11-01 14:00:00', '2023-11-15 14:00:00', 106, 206, 4),
-(7, 0, CURDATE(), 'day', NOW(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), 107, 207, 3);
+(5, 1, '2023-10-01', 'month', '2023-10-01 09:00:00', '2024-03-24', 105, 205, 2),
+(6, 0, '2023-11-15', 'custom', '2023-11-01 14:00:00', '2023-11-15 14:00:00', 106, 206, 4);
 
 INSERT INTO `paymentassistant`.`plan_prices` 
 (`prices_id`, `amount`, `post_time`, `endDate`, `current`, `plan_type_id`, `subscriptions_id`, `recurrences_id`)
